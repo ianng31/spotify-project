@@ -10,6 +10,54 @@ let spotifyApi = new SpotifyWebApi({
   redirectUri: REDIRECT_URI,
 });
 
+const clearDiscoverDaily = async (accessToken) => {
+  spotifyApi.setAccessToken(accessToken);
+  
+  spotifyApi.getMe()
+  .then(data => {
+      return {display_name: data.body.display_name, id: data.body.id}
+  })
+  .then(async userInfo => {
+
+      spotifyApi.getUserPlaylists(userInfo.id, { limit: 50 })
+        .then(async (data) => {
+          //console.log('Retrieved playlists', data.body.items[0]);
+            //data.body.items.forEach(item => console.log(item.name))
+  
+            const clearPlaylist = async () => {
+              let testPlaylist = data.body.items.find(obj => obj.name === "Discover Daily by Ian")
+              
+              if (testPlaylist !== undefined) {
+                let total = testPlaylist.tracks.total
+                while (total > 0) {
+                    let p = await spotifyApi.getPlaylist(testPlaylist.id)
+                    let tracksToRemove = p.body.tracks.items.map(x => {
+                      return {"uri" : x.track.uri}
+                    }) 
+                    
+                    console.log(tracksToRemove)
+                    
+                    await spotifyApi.removeTracksFromPlaylist(testPlaylist.id, tracksToRemove)
+                    .then(() => console.log('successfully deleted'))
+                    .catch(err => console.log('Something went wrong!', err))
+                    
+                    total += -100
+                }                
+                let newTest = await spotifyApi.getPlaylist(testPlaylist.id)
+                console.log("should now be empty", newTest.body.tracks.total)
+              }
+
+              console.log('done')
+            }
+
+            clearPlaylist()
+            
+            console.log('pls')
+        })
+        
+    })
+}
+
 export const createDiscoverDaily = (accessToken) => {
 
   spotifyApi.setAccessToken(accessToken);
@@ -29,31 +77,16 @@ export const createDiscoverDaily = (accessToken) => {
           //console.log('Retrieved playlists', data.body.items[0]);
             //data.body.items.forEach(item => console.log(item.name))
   
-  
             const createPlaylist = async () => {
               let testPlaylist = data.body.items.find(obj => obj.name === "Discover Daily by Ian")
-              
               
               if (testPlaylist === undefined) {
                 const data = await spotifyApi.createPlaylist('Discover Daily by Ian', { 'description': 'My description', 'public': true })
                 .then(() => console.log('created playlist!'))
-              } else {
-                let p = await spotifyApi.getPlaylist(testPlaylist.id)
-                let tracksToRemove = p.body.tracks.items.map(x => x.track.uri) 
-                
-                console.log(tracksToRemove)
-                
-                await spotifyApi.removeTracksFromPlaylist(testPlaylist.id, tracksToRemove)
-                .then(() => console.log('successfully deleted'))
-                .catch(err => console.log('Something went wrong!', err))
-                
-                let newTest = await spotifyApi.getPlaylist(testPlaylist.id)
-                console.log("should now be empty", newTest.body.tracks.total)
-
               }
-              console.log('done')
             }
-
+            
+            await clearDiscoverDaily(accessToken)
             await createPlaylist()
               
             let d = await spotifyApi.getUserPlaylists(userInfo.id, {limit : 50})
@@ -64,6 +97,7 @@ export const createDiscoverDaily = (accessToken) => {
             if (discoverDaily !== undefined) {
               let dailyMixes = data.body.items.filter(item => item.name.startsWith('Daily Mix'))
               let remainingPlaylists = data.body.items.filter(item => !item.name.startsWith('Daily Mix'))
+              remainingPlaylists = remainingPlaylists.filter(item => !item.name.startsWith('Discover'))
               remainingPlaylists = remainingPlaylists.filter(item => item.owner.id === userInfo.id)
               
               async function populateSet () { 
@@ -124,8 +158,9 @@ export const createDiscoverDaily = (accessToken) => {
                       tracksToAdd.push(x.track.uri)
                     }
                   })
+
                   //console.log(tracksToAdd)
-                  spotifyApi.addTracksToPlaylist(discoverDaily.id, tracksToAdd)
+                  await spotifyApi.addTracksToPlaylist(discoverDaily.id, tracksToAdd)
                   .then(function(data) {
                     console.log('Added tracks to playlist!');
                   }, function(err) {
@@ -133,7 +168,7 @@ export const createDiscoverDaily = (accessToken) => {
                   });
                 }
                 
-                //console.log('finished filtering')
+                console.log('finished filtering')
               }
               
               await populateSet().catch(x => console.log(x))
