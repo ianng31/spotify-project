@@ -89,7 +89,6 @@ const App = () => {
     <div className={classes.app}>
       {authenticated ? (
         <SpotifyApiContext.Provider value={token}>
-          <SpotifyAuthListener />
 
           {/* Your Spotify Code here */}
           <Box className={classes.box}>
