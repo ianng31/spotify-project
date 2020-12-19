@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { SpotifyApiContext } from 'react-spotify-api'
 import Cookies from 'js-cookie'
  
-import { SpotifyAuth, Scopes } from 'react-spotify-auth'
+import { SpotifyAuth, Scopes, SpotifyAuthListener } from 'react-spotify-auth'
 import 'react-spotify-auth/dist/index.css'
 import { Box, Typography, Button, CircularProgress } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
@@ -52,13 +52,27 @@ const useStyles = makeStyles(() => ({
 }));
  
 const App = () => {
-  const token = Cookies.get('spotifyAuthToken')
+  var token = Cookies.get('spotifyAuthToken')
   const classes = useStyles();
   const [state, setState] = React.useState({
     checkedB: false,
   });
 
-  const [showButton, setShowtButton] = React.useState(true)
+  const [authenticated, setAuthenticated] = useState(false)
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const getCookies = async () => {      
+      token = Cookies.get('spotifyAuthToken')
+      token && setAuthenticated(true)
+    }
+
+    getCookies()
+
+  }, [])
+
+  const [showButton, setShowtButton] = useState(true)
+  const [generated, setGenerated] = useState(false)
 
   const handleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.checked });
@@ -73,24 +87,31 @@ const App = () => {
 
   return (
     <div className={classes.app}>
-      {token ? (
+      {authenticated ? (
         <SpotifyApiContext.Provider value={token}>
+          <SpotifyAuthListener />
+
           {/* Your Spotify Code here */}
           <Box className={classes.box}>
-            <Typography className={state.checkedB ? classes.whiteText : classes.text}>Disclaimer: At the moment Spotify has not made an API for the daily mix playlists. 
-            For this feature to work please add all of your daily mix playlists to your library.
+            <Typography variant='h5' className={state.checkedB ? classes.whiteText : classes.text}> 
+            For this feature to work <b>PLEASE ADD ALL</b> of your daily mix playlists to your library first <b>before</b> generating.
             </Typography>
-            {showButton 
+            {(showButton) 
               ?             
                 <Button 
-                onClick={() => createDiscoverDaily(token, setShowtButton)}
+                onClick={() => createDiscoverDaily(token, setShowtButton, setGenerated)}
                 className={classes.button}
                 >
                   Generate Discover Daily
                 </Button>
               :
-                <CircularProgress size={100} className={classes.circle}/>
-          }
+                generated ? <Typography variant='h2' className={classes.textTitle}>
+                Discover Daily by Ian has 
+                been successfully generated.
+                Open in spotify playlists to listen
+              </Typography> : <CircularProgress size={100} className={classes.circle}/>
+            }
+
 
           </Box>
         </SpotifyApiContext.Provider>
@@ -99,7 +120,7 @@ const App = () => {
         <Box className={classes.box}>
           <Typography className={classes.textTitle} variant='h1'>Discover Daily</Typography>
           <Typography className={classes.text} >
-            Extract the songs you haven't heard of from the daily mix playlists every day
+            Extract the songs that you haven't heard of from the daily mix playlists every day
             for a complete playlist of just new songs.
           </Typography>
 
