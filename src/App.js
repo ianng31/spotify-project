@@ -4,7 +4,7 @@ import Cookies from 'js-cookie'
  
 import { SpotifyAuth, Scopes } from 'react-spotify-auth'
 import 'react-spotify-auth/dist/index.css'
-import { Box, Typography, Button } from '@material-ui/core'
+import { Box, Typography, Button, CircularProgress } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
 import GiantSwitch  from './Components/GiantSwitch'
 import { createDiscoverDaily } from './Utils/index'
@@ -42,7 +42,12 @@ const useStyles = makeStyles(() => ({
       width: '70vw',
       Height: '50vh',
       fontSize: '4vw',
-      borderRadius: '80px'
+      borderRadius: '80px',
+      marginTop: '3%',
+    },
+    circle: {
+      marginTop : '3%',
+      color: '#1db954'
     }
 }));
  
@@ -52,6 +57,8 @@ const App = () => {
   const [state, setState] = React.useState({
     checkedB: false,
   });
+
+  const [showButton, setShowtButton] = React.useState(true)
 
   const handleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.checked });
@@ -73,12 +80,18 @@ const App = () => {
             <Typography className={state.checkedB ? classes.whiteText : classes.text}>Disclaimer: At the moment Spotify has not made an API for the daily mix playlists. 
             For this feature to work please add all of your daily mix playlists to your library.
             </Typography>
-            <Button 
-            onClick={() => createDiscoverDaily(token)}
-            className={classes.button}
-            >
-              Generate Discover Daily
-            </Button>
+            {showButton 
+              ?             
+                <Button 
+                onClick={() => createDiscoverDaily(token, setShowtButton)}
+                className={classes.button}
+                >
+                  Generate Discover Daily
+                </Button>
+              :
+                <CircularProgress size={100} className={classes.circle}/>
+          }
+
           </Box>
         </SpotifyApiContext.Provider>
       ) : (

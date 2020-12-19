@@ -58,7 +58,8 @@ const clearDiscoverDaily = async (accessToken) => {
     })
 }
 
-export const createDiscoverDaily = (accessToken) => {
+export const createDiscoverDaily = (accessToken, setShowtButton) => {
+  setShowtButton(false)
 
   spotifyApi.setAccessToken(accessToken);
   
@@ -178,6 +179,7 @@ export const createDiscoverDaily = (accessToken) => {
             
   
             console.log('pls')
+            setShowtButton(true)
         })
         
     })
