@@ -1,4 +1,5 @@
 import {CLIENT_ID, CLIENT_SECRET, REDIRECT_URI} from './constants'
+require('dotenv').config()
 
 
 let SpotifyWebApi = require('spotify-web-api-node');
@@ -34,9 +35,7 @@ const clearDiscoverDaily = async (accessToken) => {
                     let tracksToRemove = p.body.tracks.items.map(x => {
                       return {"uri" : x.track.uri}
                     }) 
-                    
-                    console.log(tracksToRemove)
-                    
+                                        
                     await spotifyApi.removeTracksFromPlaylist(testPlaylist.id, tracksToRemove)
                     .then(() => console.log('successfully deleted'))
                     .catch(err => console.log('Something went wrong!', err))
@@ -67,9 +66,7 @@ export const createDiscoverDaily = (accessToken, setShowtButton, setGenerated) =
   .then(data => {
       return {display_name: data.body.display_name, id: data.body.id}
   })
-  .then(async userInfo => {
-      console.log(userInfo.id)
-  
+  .then(async userInfo => {  
       spotifyApi.getUserPlaylists(userInfo.id, { limit: 50 })
         .then(async (data) => {
             const createPlaylist = async () => {

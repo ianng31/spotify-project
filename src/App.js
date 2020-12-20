@@ -7,7 +7,9 @@ import 'react-spotify-auth/dist/index.css'
 import { Box, Typography, Button, CircularProgress } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
 import { createDiscoverDaily } from './Utils/index'
-import {CLIENT_ID, REDIRECT_URI} from './Utils/constants'
+import {CLIENT_ID, REDIRECT_URI } from './Utils/constants'
+require('dotenv').config()
+
 
 const useStyles = makeStyles(() => ({
   box: {
@@ -81,8 +83,6 @@ const App = () => {
   // };
 
   document.body.style.backgroundColor = 'white';
-
-  token && console.log(`You are authorized with token: ${token}`)
 
   return (
     <div className={classes.app}>

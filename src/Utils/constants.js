@@ -1,5 +1,5 @@
 require('dotenv').config()
 
-export const CLIENT_ID = process.env.CLIENT_ID
-export const CLIENT_SECRET = process.env.CLIENT_SECRET
-export const REDIRECT_URI = "https://discover-daily.herokuapp.com/lmaohelp"
+export const CLIENT_ID = process.env.REACT_APP_CLIENT_ID
+export const CLIENT_SECRET = process.env.REACT_APP_CLIENT_SECRET
+export const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI
