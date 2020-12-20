@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { SpotifyApiContext } from 'react-spotify-api'
 import Cookies from 'js-cookie'
  
-import { SpotifyAuth, Scopes, SpotifyAuthListener } from 'react-spotify-auth'
+import { SpotifyAuth, Scopes } from 'react-spotify-auth'
 import 'react-spotify-auth/dist/index.css'
 import { Box, Typography, Button, CircularProgress } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
-import GiantSwitch  from './Components/GiantSwitch'
 import { createDiscoverDaily } from './Utils/index'
 import {CLIENT_ID, REDIRECT_URI} from './Utils/constants'
 
@@ -54,15 +53,15 @@ const useStyles = makeStyles(() => ({
 const App = () => {
   var token = Cookies.get('spotifyAuthToken')
   const classes = useStyles();
-  const [state, setState] = React.useState({
+  const [state] = React.useState({
     checkedB: false,
   });
 
   const [authenticated, setAuthenticated] = useState(false)
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const getCookies = async () => {      
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       token = Cookies.get('spotifyAuthToken')
       token && setAuthenticated(true)
     }
@@ -74,12 +73,12 @@ const App = () => {
   const [showButton, setShowtButton] = useState(true)
   const [generated, setGenerated] = useState(false)
 
-  const handleChange = (event) => {
-    setState({ ...state, [event.target.name]: event.target.checked });
-    if (event.target.checked) {
-      console.log('yes yes')
-    }
-  };
+  // const handleChange = (event) => {
+  //   setState({ ...state, [event.target.name]: event.target.checked });
+  //   if (event.target.checked) {
+  //     console.log('yes yes')
+  //   }
+  // };
 
   document.body.style.backgroundColor = 'white';
 
@@ -93,7 +92,7 @@ const App = () => {
           {/* Your Spotify Code here */}
           <Box className={classes.box}>
             <Typography variant='h5' className={state.checkedB ? classes.whiteText : classes.text}> 
-            For this feature to work <b>PLEASE ADD ALL</b> of your daily mix playlists to your library first <b>before</b> generating.
+            For this feature to work <b>PLEASE ADD ALL</b> of your daily mix playlists to your playlist library first <b>before</b> generating.
             </Typography>
             {(showButton) 
               ?             
@@ -107,7 +106,7 @@ const App = () => {
                 generated ? <Typography variant='h2' className={classes.textTitle}>
                 Discover Daily by Ian has 
                 been successfully generated.
-                Open in spotify playlists to listen
+                Open in Spotify playlists to listen
               </Typography> : <CircularProgress size={100} className={classes.circle}/>
             }
 
@@ -130,7 +129,8 @@ const App = () => {
               [
                 Scopes.playlistReadPrivate, 
                 Scopes.playlistModifyPublic, 
-                Scopes.playlistReadCollaborative
+                Scopes.playlistReadCollaborative,
+                Scopes.userLibraryRead
               ]
             }
           />

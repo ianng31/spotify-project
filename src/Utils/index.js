@@ -50,9 +50,7 @@ const clearDiscoverDaily = async (accessToken) => {
               console.log('done')
             }
 
-            clearPlaylist()
-            
-            console.log('pls')
+            clearPlaylist()            
         })
         
     })
@@ -60,7 +58,6 @@ const clearDiscoverDaily = async (accessToken) => {
 
 export const createDiscoverDaily = (accessToken, setShowtButton, setGenerated) => {
   setShowtButton(false)
-
   spotifyApi.setAccessToken(accessToken);
   
   let mySetNames = new Set()
@@ -75,14 +72,11 @@ export const createDiscoverDaily = (accessToken, setShowtButton, setGenerated) =
   
       spotifyApi.getUserPlaylists(userInfo.id, { limit: 50 })
         .then(async (data) => {
-          //console.log('Retrieved playlists', data.body.items[0]);
-            //data.body.items.forEach(item => console.log(item.name))
-  
             const createPlaylist = async () => {
               let testPlaylist = data.body.items.find(obj => obj.name === "Discover Daily by Ian")
               
               if (testPlaylist === undefined) {
-                const data = await spotifyApi.createPlaylist('Discover Daily by Ian', { 'description': 'My description', 'public': true })
+                await spotifyApi.createPlaylist('Discover Daily by Ian', { 'description': 'A series of extracted tracks from the Daily Mix playlists that aren\'t already in your existing playlists', 'public': true })
                 .then(() => console.log('created playlist!'))
               }
             }
@@ -101,8 +95,7 @@ export const createDiscoverDaily = (accessToken, setShowtButton, setGenerated) =
               remainingPlaylists = remainingPlaylists.filter(item => !item.name.startsWith('Discover'))
               remainingPlaylists = remainingPlaylists.filter(item => item.owner.id === userInfo.id)
               
-              async function populateSet () { 
-                
+              async function populateSet () {   
                 for (const x of remainingPlaylists) {
                   let remainingSongs = x.tracks.total;
                   //console.log(x.name + " has " + remainingSongs)
@@ -140,9 +133,33 @@ export const createDiscoverDaily = (accessToken, setShowtButton, setGenerated) =
                   }
   
                 }
+
                 console.log('finished populating')
               }
               
+              const populateSetWithLikedSongs = async () => {              
+                let offset = 0
+                let data = await spotifyApi.getMySavedTracks({limit : 50 });
+                let count = data.body.total
+                while (count - 50 > 0) {
+                  data.body.items.forEach(x => {
+                    mySetIDs.add(x.track.id)
+                    mySetNames.add(x.track.name)
+                  })
+
+                  count += -50
+                  offset += 50
+                  data = await spotifyApi.getMySavedTracks({limit : 50, offset : offset });
+                }
+              
+                data.body.items.forEach(x => {
+                  mySetIDs.add(x.track.id)
+                  mySetNames.add(x.track.name)
+                })
+
+                console.log('finished populating set with liked songs')
+              }
+
               async function filterSongs () {
                 for (const x of dailyMixes) {
                   let playlist = await spotifyApi.getPlaylist(x.id)    
@@ -173,16 +190,16 @@ export const createDiscoverDaily = (accessToken, setShowtButton, setGenerated) =
               }
               
               await populateSet().catch(x => console.log(x))
+              await populateSetWithLikedSongs()
               console.log(mySetIDs.size, mySetNames.size);
               await filterSongs()
             }
             
   
             console.log('pls')
-            //setShowtButton(true)
             setGenerated(true)
         })
         
-    })
+  })
 }
 
