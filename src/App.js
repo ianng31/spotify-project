@@ -92,7 +92,7 @@ const App = () => {
           {/* Your Spotify Code here */}
           <Box className={classes.box}>
             <Typography variant='h5' className={state.checkedB ? classes.whiteText : classes.text}> 
-            For this feature to work <b>PLEASE ADD ALL</b> of your daily mix playlists to your playlist library first <b>before</b> generating.
+            For this feature to work please go to Spotify first and <b>FOLLOW/LIKE ALL</b> of your <b>Daily Mix</b> playlists  <b>before</b> generating.
             </Typography>
             {(showButton) 
               ?             
@@ -100,7 +100,7 @@ const App = () => {
                 onClick={() => createDiscoverDaily(token, setShowtButton, setGenerated)}
                 className={classes.button}
                 >
-                  Generate Discover Daily
+                  Generate My Discover Daily
                 </Button>
               :
                 generated ? <Typography variant='h2' className={classes.textTitle}>
@@ -118,8 +118,8 @@ const App = () => {
         <Box className={classes.box}>
           <Typography className={classes.textTitle} variant='h1'>Discover Daily</Typography>
           <Typography className={classes.text} >
-            Extract the songs that you haven't heard of from the daily mix playlists every day
-            for a complete playlist of just new songs.
+            Discover Daily extracts songs from your Daily Mix albums that aren't aready in one of your existing playlists
+            and creates a complete playlist of just new songs.
           </Typography>
 
           <SpotifyAuth
