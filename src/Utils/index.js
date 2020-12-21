@@ -1,4 +1,4 @@
-import {CLIENT_ID, CLIENT_SECRET, REDIRECT_URI} from './constants'
+import {CLIENT_ID, REDIRECT_URI} from './constants'
 require('dotenv').config()
 
 
@@ -7,7 +7,6 @@ let SpotifyWebApi = require('spotify-web-api-node');
 // credentials are optional
 let spotifyApi = new SpotifyWebApi({
   clientId: CLIENT_ID,
-  clientSecret: CLIENT_SECRET,
   redirectUri: REDIRECT_URI,
 });
 
